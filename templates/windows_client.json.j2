@@ -6,6 +6,13 @@
       "bind": "127.0.0.1",
       "port": 3030
     },
+    "keepalive": {
+      "handlers": {{ sensu_client_keepalive_handlers | to_nice_json(indent=8) }},
+      "thresholds": {
+        "warning": {{ sensu_client_keepalive_threshold_warning }},
+        "critical": {{ sensu_client_keepalive_threshold_critical }}
+      }
+    },
     "subscriptions": {{ sensu_client_subscriptions | to_nice_json | indent(width=2) }}
   }
 }
