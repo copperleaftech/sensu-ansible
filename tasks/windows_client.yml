@@ -9,6 +9,7 @@
     win_get_url:
       url: "{{ sensu_msi_download_path }}"
       dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
+      force: no
 
     # If a version already exists on the target system, it should be made absent first.
   - name: Install sensu-client from local dir
