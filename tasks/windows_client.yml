@@ -5,6 +5,10 @@
     #- include_vars: "{{ ansible_distribution }}.yml"
   - include_vars: "{{ ansible_os_family }}.yml"
 
+  - name: Ensure Temp Directory exists
+    win_file:
+      path: "{{ sensu_win_temp_path }}"
+
   - name: Download the Sensu installer msi into a local dir
     win_get_url:
       url: "{{ sensu_msi_download_path }}"
