@@ -8,6 +8,7 @@
   - name: Ensure Temp Directory exists
     win_file:
       path: "{{ sensu_win_temp_path }}"
+      state: directory
 
   - name: Download the Sensu installer msi into a local dir
     win_get_url:
