@@ -15,6 +15,7 @@
       url: "{{ sensu_msi_download_path }}"
       dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
       force: no
+      timeout: "60"
 
     # If a version already exists on the target system, it should be made absent first.
   - name: Install sensu-client from local dir
@@ -84,12 +85,14 @@
     win_get_url: 
       url: "http://github.com/sensu-plugins/sensu-plugins-windows/zipball/{{ sensu_win_plugins_commit_id }}/"
       dest: c:/temp/sensu-plugins.zip
+      force: no
     when: install_plugins
 
   - name: Install sensu-plugins-windows into bin
     win_unzip:
       src: c:/temp/sensu-plugins.zip
       dest: "{{ sensu_win_base_path }}\\bin"
+      delete_archive: yes
     when: install_plugins
 
   - name: Check if plugins folder exists
