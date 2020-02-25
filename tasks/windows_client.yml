@@ -20,8 +20,6 @@
   - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq 'Sensu'} | Select-Object 'IdentifyingNumber'
     register: installed_guid
 
-  - debug: var=installed_guid
-
     # If a version already exists on the target system, it should be made absent first.
   - name: Uninstall sensu-client from local dir
     win_package:
