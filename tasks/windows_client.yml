@@ -21,7 +21,7 @@
     register: installed_guid
 
     # If a version already exists on the target system, it should be made absent first.
-  - name: Uninstall sensu-client from local dir
+  - name: Uninstall sensu-client if version is out of date
     win_package:
       path: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
       arguments: /qn
