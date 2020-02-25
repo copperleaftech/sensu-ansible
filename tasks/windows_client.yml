@@ -14,7 +14,7 @@
     win_get_url:
       url: "{{ sensu_msi_download_path }}"
       dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
-      force: no
+      force: yes
       timeout: "60"
 
   - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq 'Sensu'} | Select-Object 'IdentifyingNumber'
