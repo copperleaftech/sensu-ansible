@@ -17,9 +17,9 @@
       force: no
       timeout: "60"
 
-  - name: Get current Sensu GUID
-    win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq "Google Chrome"} | Select-Object "IdentifyingNumber"
+  - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq "Google Chrome"} | Select-Object "IdentifyingNumber"
     register: installed_guid
+
     debug: var=installed_guid
 
     # If a version already exists on the target system, it should be made absent first.
