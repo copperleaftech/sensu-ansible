@@ -17,7 +17,7 @@
       force: no
       timeout: "60"
 
-  - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq "Google Chrome"} | Select-Object "IdentifyingNumber"
+  - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq 'Sensu'} | Select-Object 'IdentifyingNumber'
     register: installed_guid
 
     debug: var=installed_guid
