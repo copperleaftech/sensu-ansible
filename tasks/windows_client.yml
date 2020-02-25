@@ -25,7 +25,7 @@
       arguments: /qn
       force_extension: msi
       validate_certs: no
-      state: absent
+      state: present
 
   - name: Build the config folders
     win_file:
