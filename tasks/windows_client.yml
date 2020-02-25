@@ -30,7 +30,7 @@
       force_extension: msi
       validate_certs: no
       state: absent
-    when: '{{ sensu_msi_product_id }} not in installed_guid.stdout'
+    when: sensu_msi_product_id not in installed_guid.stdout
 
   - name: Install sensu-client from local dir
     win_package:
