@@ -18,16 +18,6 @@
       timeout: "60"
 
     # If a version already exists on the target system, it should be made absent first.
-  - name: Uninstall sensu-client from local dir
-    win_package:
-      path: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
-      product_id: "{{ sensu_msi_product_id }}"
-      arguments: /qn
-      force_extension: msi
-      validate_certs: no
-      state: absent
-    when: uninstall
-
   - name: Install sensu-client from local dir
     win_package:
       path: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
@@ -35,7 +25,7 @@
       arguments: /qn
       force_extension: msi
       validate_certs: no
-      state: present
+      state: absent
 
   - name: Build the config folders
     win_file:
