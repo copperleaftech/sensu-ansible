@@ -119,5 +119,5 @@
   - name: Ensure Sensu client service is running on Windows
     win_service:
       name: "{{ sensu_client_service_name }}"
-      state: started
+      state: "{{ sensu_client_service_restart }}"
       enabled: yes
