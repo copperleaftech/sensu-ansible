@@ -3,6 +3,12 @@
     "name": "{{ sensu_client_name }}",
     "address": "{{ ansible_default_ipv4['address'] }}",
     "subscriptions": {{ sensu_client_subscriptions | to_nice_json(indent=6) }},
+    "aws_tags": {
+        "Name": "{{ ec2_tag_Name | default('') }}",
+        "Owner": "{{ ec2_tag_Owner | default('') }}",
+        "Team": "{{ ec2_tag_Team | default('') }}",
+        "Customer": "{{ ec2_tag_Customer | default('') }}"
+    },
     "keepalive": {
       "handlers": {{ sensu_client_keepalive_handlers | to_nice_json(indent=8) }},
       "thresholds": {
