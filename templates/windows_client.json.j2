@@ -13,6 +13,12 @@
         "critical": {{ sensu_client_keepalive_threshold_critical }}
       }
     },
-    "subscriptions": {{ sensu_client_subscriptions | to_nice_json | indent(width=2) }}
+    "subscriptions": {{ sensu_client_subscriptions | to_nice_json | indent(width=2) }},
+    "aws_tags": {
+        "Name": "{{ ec2_tag_Name | default('') }}",
+        "Owner": "{{ ec2_tag_Owner | default('') }}",
+        "Team": "{{ ec2_tag_Team | default('') }}",
+        "Customer": "{{ ec2_tag_Customer | default('') }}"
+    }
   }
 }
