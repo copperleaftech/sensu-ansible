@@ -1,4 +1,11 @@
 ---
+
+# Windows vars (forward slashes for JSON compatiblity)
+windows_server: "{{ (ansible_os_family == 'Windows') | ternary(true,false) }}"
+sensu_win_base_path: "c:/opt/sensu"
+sensu_win_temp_path: "c:\\temp" # Double backslash paths are required for win_* modules
+sensu_win_plugins_commit_id: "9c2fdfd"
+
 # Sensu enterprise credential
 # Variables for Sensu Enterprise License
 se_enterprise: false
@@ -11,12 +18,9 @@ sensu_pkg_version:  # This 'none' value allows the var to be overriden in /vars 
 sensu_enterprise_package: sensu-enterprise
 sensu_enterprise_dashboard_package: sensu-enterprise-dashboard
 
-# Pagerduty agent urls
-pdagent_apt_key_url: "https://packages.pagerduty.com/GPG-KEY-pagerduty"
-pdagent_apt_repo_url: "deb     https://packages.pagerduty.com/pdagent deb/"
-
 # Sensu repo urls
 sensu_yum_repo_url: "https://eol-repositories.sensuapp.org/yum/$releasever/$basearch/"
+sensu_yum_key_url: "https://eol-repositories.sensuapp.org/yum/pubkey.gpg"
 sensu_apt_repo_url: "deb     https://eol-repositories.sensuapp.org/apt {{ ansible_distribution_release }} main"
 sensu_apt_key_url: "https://eol-repositories.sensuapp.org/apt/pubkey.gpg"
 sensu_freebsd_url: "https://sensu.global.ssl.fastly.net/freebsd/FreeBSD:{{ ansible_distribution_major_version }}:{{ ansible_architecture }}/"
@@ -30,15 +34,14 @@ sensu_enterprise_dashboard_service_name: sensu-enterprise-dashboard
 uchiwa_service_name: uchiwa
 
 # Service deployment options
-sensu_deploy_rabbitmq: true
-sensu_deploy_redis: true
+sensu_deploy_rabbitmq_server: true
+sensu_deploy_redis_server: true
 
 # RabbitMQ server properties
 rabbitmq_config_path: /etc/rabbitmq
 rabbitmq_config_template: rabbitmq.config.j2
 rabbitmq_enable_ssl: true
-##rabbitmq_host: "{{ groups['rabbitmq_servers'][0] }}"
-rabbitmq_host: "{{ hostvars[groups['sensu_masters'][0]].ansible_default_ipv4.address }}"
+rabbitmq_host: "{{ groups['rabbitmq_servers'][0] }}"
 rabbitmq_port: 5671
 rabbitmq_pkg_state: present
 rabbitmq_server: false
@@ -48,8 +51,7 @@ rabbitmq_sensu_password: sensu
 rabbitmq_sensu_vhost: /sensu
 
 # redis server properties
-##redis_host: "{{ groups['redis_servers'][0] }}"
-redis_host: "127.0.0.1"
+redis_host: "{{ groups['redis_servers'][0] }}"
 redis_server: false
 redis_service_name: redis
 redis_pkg_repo: ~
@@ -62,8 +64,7 @@ redis_master_name:
 sensu_redis_config: sensu-redis.json.j2
 
 # Sensu/Uchiwa user/group/service properties
-#sensu_api_host: "{{ groups['sensu_masters'][0] }}"
-sensu_api_host: "127.0.0.1" # api should connect to localhost on aws
+sensu_api_host: "{{ groups['sensu_masters'][0] }}"
 sensu_api_port: 4567
 sensu_api_ssl: "false"
 sensu_api_user_name: admin
@@ -80,11 +81,20 @@ sensu_group_name: sensu
 sensu_include_plugins: true
 sensu_include_dashboard: false
 sensu_master: false
+sensu_client: true
 sensu_user_name: sensu
-sensu_remote_plugins: ~
+sensu_remote_plugins: []
 sensu_transport: rabbitmq
 sensu_client_name: "{{ ansible_hostname }}"
 sensu_client_subscriptions: "{{ group_names }}"
+sensu_client_keepalive_handlers:
+  - default
+sensu_client_keepalive_threshold_warning: 120
+sensu_client_keepalive_threshold_critical: 180
+sensu_client_safe_mode: false
+sensu_deploy_rabbitmq_config: true
+sensu_deploy_redis_config: true
+sensu_deploy_transport_config: true
 
 # Sensu/RabbitMQ SSL certificate properties
 sensu_ssl_gen_certs: true
@@ -97,7 +107,6 @@ sensu_ssl_client_key: "{{ sensu_ssl_tool_base_path }}/client/key.pem"
 sensu_ssl_server_cacert: "{{ sensu_ssl_tool_base_path }}/sensu_ca/cacert.pem"
 sensu_ssl_server_cert: "{{ sensu_ssl_tool_base_path }}/server/cert.pem"
 sensu_ssl_server_key: "{{ sensu_ssl_tool_base_path }}/server/key.pem"
-sensu_ssl_tool_version: "0.23"
 dynamic_data_store: "{{ playbook_dir }}/data/store"
 static_data_store: "{{ playbook_dir}}/data/static"
 

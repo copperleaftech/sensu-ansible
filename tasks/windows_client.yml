@@ -1,0 +1,123 @@
+---
+# tasks/windows_client.yml: Deploy various client-side configurations for Sensu-client on Windows
+# This contains all tasks, but these should be moved off into their respective places.
+
+    #- include_vars: "{{ ansible_distribution }}.yml"
+  - include_vars: "{{ ansible_os_family }}.yml"
+
+  - name: Ensure Temp Directory exists
+    win_file:
+      path: "{{ sensu_win_temp_path }}"
+      state: directory
+
+  - name: Download the Sensu installer msi into a local dir
+    win_get_url:
+      url: "{{ sensu_msi_download_path }}"
+      dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
+      force: yes
+      timeout: "60"
+
+  - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq 'Sensu'} | Select-Object 'IdentifyingNumber'
+    register: installed_guid
+
+    # If a version already exists on the target system, it should be made absent first.
+  - name: Uninstall sensu-client if version is out of date
+    win_package:
+      path: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
+      arguments: /qn
+      force_extension: msi
+      validate_certs: no
+      state: absent
+    when: sensu_msi_product_id not in installed_guid.stdout
+
+  - name: Install sensu-client from local dir
+    win_package:
+      path: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
+      product_id: "{{ sensu_msi_product_id }}"
+      arguments: /qn
+      force_extension: msi
+      validate_certs: no
+      state: present
+
+  - name: Build the config folders
+    win_file:
+      dest: "{{ sensu_win_base_path }}\\conf.d\\ssl"
+      state: directory
+
+  - name: Deploy Sensu Redis configuration
+    win_template:
+      dest: "{{ sensu_win_base_path }}\\conf.d\\redis.json"
+      src: "{{ sensu_redis_config }}"
+    when: sensu_deploy_redis
+    notify:
+      - restart sensu-client service
+
+  - name: Deploy Sensu RabbitMQ configuration on Windows
+    win_template:
+      dest: "{{ sensu_win_base_path }}\\conf.d\\rabbitmq.json"
+      src: "{{ sensu_win_rabbitmq_config }}"
+    when: sensu_transport == "rabbitmq"
+    notify:
+      - restart sensu-api service
+      - restart sensu-client service
+
+  - name: Deploy Sensu transport configuration on Windows
+    win_template:
+      dest: "{{ sensu_win_base_path }}\\conf.d\\transport.json"
+      src: transport.json.j2
+    notify:
+      - restart sensu-client service
+
+  - name: Deploy Sensu client service configuration on Windows
+    win_template:
+      dest: "{{ sensu_win_base_path }}\\conf.d\\client.json"
+      src: "{{ sensu_client_config  }}"
+    notify: restart sensu-client service
+
+  - name: Deploy the Sensu client SSL cert/key on Windows
+    win_copy:
+      src: "{{ item.src }}"
+      remote_src: "{{ sensu_ssl_deploy_remote_src }}"
+      dest: "{{ sensu_win_base_path }}\\conf.d\\ssl\\{{ item.dest }}"
+    with_items:
+      - { src: "{{ sensu_ssl_client_cert }}", dest: cert.pem }
+      - { src: "{{ sensu_ssl_client_key }}", dest: key.pem }
+    notify: restart sensu-client service
+    when: sensu_ssl_gen_certs
+
+  - name: Install the sensu-client service
+    win_service:
+      name: sensu-client
+      path: 'c:\opt\sensu\bin\sensu-client.exe'
+      display_name: Sensu Client
+      description: The Sensu Client Service
+      start_mode: delayed
+
+  - name: Fetch sensu-plugins-windows repo 
+    win_get_url: 
+      url: "http://github.com/sensu-plugins/sensu-plugins-windows/zipball/{{ sensu_win_plugins_commit_id }}/"
+      dest: c:/temp/sensu-plugins.zip
+      force: no
+    when: install_plugins
+
+  - name: Install sensu-plugins-windows into bin
+    win_unzip:
+      src: c:/temp/sensu-plugins.zip
+      dest: "{{ sensu_win_base_path }}\\bin"
+      delete_archive: yes
+    when: install_plugins
+
+  - name: Check if plugins folder exists
+    win_stat:
+      path: "{{ sensu_win_base_path }}\\bin\\sensu-plugins-windows"
+    register: file_info
+
+  - name: Rename the plugins folder
+    raw: "cmd /C 'cd c:/opt/sensu/bin & rename sensu-plugins-sensu-plugins-windows-{{ sensu_win_plugins_commit_id }} sensu-plugins-windows'"
+    when: install_plugins and not file_info.stat.exists
+
+  - name: Ensure Sensu client service is running on Windows
+    win_service:
+      name: "{{ sensu_client_service_name }}"
+      state: started
+      enabled: yes
