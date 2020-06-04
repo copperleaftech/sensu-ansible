@@ -30,8 +30,8 @@
     tags: rabbitmq
     when: rabbitmq_server
           and sensu_deploy_rabbitmq_server
+          and not windows_server
     static: false
-    when: not windows_server
 
   - include: "{{ role_path }}/tasks/common.yml"
     tags: common
