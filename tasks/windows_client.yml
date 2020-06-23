@@ -49,8 +49,6 @@
       dest: "{{ sensu_win_base_path }}\\conf.d\\redis.json"
       src: "{{ sensu_redis_config }}"
     when: sensu_deploy_redis
-    notify:
-      - restart sensu-client service
 
   - name: Deploy Sensu RabbitMQ configuration on Windows
     win_template:
@@ -59,20 +57,17 @@
     when: sensu_transport == "rabbitmq"
     notify:
       - restart sensu-api service
-      - restart sensu-client service
 
   - name: Deploy Sensu transport configuration on Windows
     win_template:
       dest: "{{ sensu_win_base_path }}\\conf.d\\transport.json"
       src: transport.json.j2
-    notify:
-      - restart sensu-client service
 
   - name: Deploy Sensu client service configuration on Windows
     win_template:
       dest: "{{ sensu_win_base_path }}\\conf.d\\client.json"
       src: "{{ sensu_client_config  }}"
-    notify: restart sensu-client service
+    register: client_config
 
   - name: Deploy the Sensu client SSL cert/key on Windows
     win_copy:
@@ -82,7 +77,6 @@
     with_items:
       - { src: "{{ sensu_ssl_client_cert }}", dest: cert.pem }
       - { src: "{{ sensu_ssl_client_key }}", dest: key.pem }
-    notify: restart sensu-client service
     when: sensu_ssl_gen_certs
 
   - name: Install the sensu-client service
@@ -115,6 +109,13 @@
   - name: Rename the plugins folder
     raw: "cmd /C 'cd c:/opt/sensu/bin & rename sensu-plugins-sensu-plugins-windows-{{ sensu_win_plugins_commit_id }} sensu-plugins-windows'"
     when: install_plugins and not file_info.stat.exists
+
+  - name: Restart Sensu client service if client config changed
+    win_service: 
+      name: "{{ sensu_client_service_name }}"
+      state: restarted 
+      enabled: yes
+    when: client_config.changed
 
   - name: Ensure Sensu client service is running on Windows
     win_service:
