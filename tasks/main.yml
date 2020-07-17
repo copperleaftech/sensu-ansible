@@ -5,7 +5,7 @@
     when: not windows_server
 
   - include_vars: "{{ ansible_os_family }}.yml"
-    when: windows_server
+    when: windows_server|bool
 
   - include: "{{ role_path }}/tasks/{{ ansible_distribution }}/main.yml"
     tags: setup
@@ -14,7 +14,7 @@
     # windows server path with no spaces
   - include: "{{ role_path }}/tasks/{{ ansible_os_family }}/main.yml"
     tags: setup
-    when: windows_server
+    when: windows_server|bool
 
   - include: "{{ role_path }}/tasks/redis.yml"
     tags: redis
@@ -41,12 +41,12 @@
 
   - include: "{{ role_path }}/tasks/server.yml"
     tags: server
-    when: sensu_master
+    when: sensu_master|bool
     static: false
 
   - include: "{{ role_path }}/tasks/dashboard.yml"
     tags: dashboard
-    when: sensu_include_dashboard
+    when: sensu_include_dashboard|bool
     static: false
 
   - include: "{{ role_path }}/tasks/client.yml"

@@ -48,7 +48,7 @@
     win_template:
       dest: "{{ sensu_win_base_path }}\\conf.d\\redis.json"
       src: "{{ sensu_redis_config }}"
-    when: sensu_deploy_redis
+    when: sensu_deploy_redis|bool
 
   - name: Deploy Sensu RabbitMQ configuration on Windows
     win_template:
@@ -77,7 +77,7 @@
     with_items:
       - { src: "{{ sensu_ssl_client_cert }}", dest: cert.pem }
       - { src: "{{ sensu_ssl_client_key }}", dest: key.pem }
-    when: sensu_ssl_gen_certs
+    when: sensu_ssl_gen_certs|bool
 
   - name: Install the sensu-client service
     win_service:
@@ -92,14 +92,14 @@
       url: "http://github.com/sensu-plugins/sensu-plugins-windows/zipball/{{ sensu_win_plugins_commit_id }}/"
       dest: c:/temp/sensu-plugins.zip
       force: no
-    when: install_plugins
+    when: install_plugins|bool
 
   - name: Install sensu-plugins-windows into bin
     win_unzip:
       src: c:/temp/sensu-plugins.zip
       dest: "{{ sensu_win_base_path }}\\bin"
       delete_archive: yes
-    when: install_plugins
+    when: install_plugins|bool
 
   - name: Check if plugins folder exists
     win_stat:
