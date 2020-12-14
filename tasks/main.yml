@@ -53,10 +53,10 @@
     tags: client
     when: not windows_server
 
-  - include: "{{ role_path }}/tasks/windows_client.yml"
-    tags: client
-    when: windows_server
-          and sensu_client
+  # - include: "{{ role_path }}/tasks/windows_client.yml"
+  #   tags: client
+  #   when: windows_server|bool
+  #         and sensu_client
 
   - include: "{{ role_path }}/tasks/plugins.yml"
     tags: plugins
