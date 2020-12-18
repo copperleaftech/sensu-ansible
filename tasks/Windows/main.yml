@@ -1,6 +1,5 @@
 ---
-# tasks/windows_client.yml: Deploy various client-side configurations for Sensu-client on Windows
-# This contains all tasks, but these should be moved off into their respective places.
+# tasks/Windows/main.yml: Deploy various client-side configurations for Sensu client on Windows
 
     #- include_vars: "{{ ansible_distribution }}.yml"
   - include_vars: "{{ ansible_os_family }}.yml"
