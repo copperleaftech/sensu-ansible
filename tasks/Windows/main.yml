@@ -54,6 +54,7 @@
       dest: "{{ sensu_win_base_path }}\\conf.d\\rabbitmq.json"
       src: "{{ sensu_win_rabbitmq_config }}"
     when: sensu_transport == "rabbitmq"
+    register: rabbitmq_config
     notify:
       - restart sensu-api service
 
@@ -114,7 +115,7 @@
       name: "{{ sensu_client_service_name }}"
       state: restarted 
       enabled: yes
-    when: client_config.changed
+    when: client_config.changed or rabbitmq_config.changed
 
   - name: Ensure Sensu client service is running on Windows
     win_service:
