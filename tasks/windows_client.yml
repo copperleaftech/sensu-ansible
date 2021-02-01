@@ -10,12 +10,19 @@
       path: "{{ sensu_win_temp_path }}"
       state: directory
 
-  - name: Download the Sensu installer msi into a local dir
-    win_get_url:
-      url: "{{ sensu_msi_download_path }}"
-      dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
-      force: yes
-      timeout: "60"
+  # - name: Download the Sensu installer msi into a local dir
+  #   win_get_url:
+  #     url: "{{ sensu_msi_download_path }}"
+  #     dest: "{{ sensu_win_temp_path }}\\sensu-installer.msi"
+  #     force: yes
+  #     timeout: "60"
+
+  - name: Download the Sensu installer msi into a local dir (S3 version)
+    win_shell: >-
+      aws s3 cp s3://copperleaf-devops-tools/sensu-installer.msi {{ sensu_win_temp_path }} --region ca-central-1
+    environment:
+      AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
 
   - win_shell: get-wmiobject Win32_Product | Where-Object {$_.Name -eq 'Sensu'} | Select-Object 'IdentifyingNumber'
     register: installed_guid
