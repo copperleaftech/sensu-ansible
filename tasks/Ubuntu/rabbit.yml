@@ -4,14 +4,21 @@
 
   - include_vars: "{{ ansible_distribution }}.yml"
 
-  - name: Ensure the RabbitMQ APT repo GPG key is present
+  # https://www.rabbitmq.com/signatures.html
+  - name: Ensure the PackageCloud APT repo GPG key is present
     apt_key:
-      url: https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+      url: https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey
       state: present
 
+  - name: Ensure the RabbitMQ APT repo GPG key is present
+    apt_key:
+      url: https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
+      state: present
+
+  # https://www.rabbitmq.com/install-debian.html
   - name: Ensure the RabbitMQ APT repo is present
     apt_repository:
-      repo: "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_distribution_release }} main"
+      repo: "deb https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ {{ ansible_distribution_release }} main"
       filename: rabbitmq
       state: present
       update_cache: true
