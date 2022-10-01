@@ -35,6 +35,11 @@
       state: present
       update_cache: true
 
+  - name: Force remove RabbitMQ
+    shell: apt-get purge -y --allow-change-held-packages rabbitmq-server
+    args:
+      warn: false
+
   - name: Ensure RabbitMQ is installed
     apt:
       name: rabbitmq-server=3.9.23-1
@@ -42,3 +47,8 @@
       state: "{{ rabbitmq_pkg_state }}"
       cache_valid_time: 600
       update_cache: true
+
+  - name: Mark packages selection state to hold
+    dpkg_selections:
+      name: "rabbitmq-server"
+      selection: hold
