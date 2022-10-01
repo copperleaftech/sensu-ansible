@@ -37,7 +37,8 @@
 
   - name: Ensure RabbitMQ is installed
     apt:
-      name: rabbitmq-server
+      name: rabbitmq-server=3.9.23-1
+      allow_downgrade: true
       state: "{{ rabbitmq_pkg_state }}"
       cache_valid_time: 600
       update_cache: true
