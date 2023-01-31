@@ -16,11 +16,11 @@
   #     url: "{{ sensu_apt_key_url }}"
   #     state: present
 
-  - name: Ensure the Sensu Core APT repo is present
-    apt_repository:
-      repo: "{{ sensu_apt_repo_url }}"
-      state: present
-      update_cache: true
+  # - name: Ensure the Sensu Core APT repo is present
+  #  apt_repository:
+  #    repo: "{{ sensu_apt_repo_url }}"
+  #    state: present
+  #    update_cache: true
 
   - name: Ensure Sensu is installed
     apt:
