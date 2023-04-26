@@ -4,14 +4,16 @@
 
   - include_vars: "{{ ansible_distribution }}.yml"
 
+  # https://www.rabbitmq.com/signatures.html
   - name: Ensure the RabbitMQ APT repo GPG key is present
     apt_key:
-      url: https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+      url: https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
       state: present
 
+  # https://www.rabbitmq.com/install-debian.html
   - name: Ensure the RabbitMQ APT repo is present
     apt_repository:
-      repo: "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_distribution_release }} main"
+      repo: "deb https://packagecloud.io/rabbitmq/rabbitmq-server/debian/ {{ ansible_distribution_release }} main"
       filename: rabbitmq
       state: present
       update_cache: true
@@ -28,9 +30,20 @@
       state: present
       update_cache: true
 
+  - name: Force remove RabbitMQ
+    shell: apt-get purge -y --allow-change-held-packages rabbitmq-server
+    args:
+      warn: false
+
   - name: Ensure RabbitMQ is installed
     apt:
-      name: rabbitmq-server
+      name: rabbitmq-server=3.9.23-1
+      allow_downgrade: true
       state: "{{ rabbitmq_pkg_state }}"
       cache_valid_time: 600
       update_cache: true
+
+  - name: Mark packages selection state to hold
+    dpkg_selections:
+      name: "rabbitmq-server"
+      selection: hold
