@@ -9,7 +9,6 @@
         "Team": "{{ ec2_tag_Team | default('') }}",
         "Customer": "{{ ec2_tag_Customer | default('') }}",
         "CostCenter": "{{ ec2_tag_CostCenter | default('') }}",
-        "Admins": "{{ ec2_tag_Admins | default('') }}"
     },
     "keepalive": {
       "handlers": {{ sensu_client_keepalive_handlers | to_nice_json(indent=8) }},
