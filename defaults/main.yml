@@ -21,7 +21,7 @@ sensu_enterprise_dashboard_package: sensu-enterprise-dashboard
 # Sensu repo urls
 sensu_yum_repo_url: "https://eol-repositories.sensuapp.org/yum/$releasever/$basearch/"
 sensu_yum_key_url: "https://eol-repositories.sensuapp.org/yum/pubkey.gpg"
-sensu_apt_repo_url: "deb [trusted=yes] https://copperleaf.jfrog.io/artifactory/sensu {{ ansible_distribution_release }} main"
+sensu_apt_repo_url: "deb [trusted=yes] https://copperleaf.jfrog.io/artifactory/sensu/{{ ansible_distribution_release }}/main"
 sensu_apt_key_url: "https://eol-repositories.sensuapp.org/apt/pubkey.gpg"
 sensu_freebsd_url: "https://sensu.global.ssl.fastly.net/freebsd/FreeBSD:{{ ansible_distribution_major_version }}:{{ ansible_architecture }}/"
 
